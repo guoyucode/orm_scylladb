@@ -90,7 +90,7 @@ pub fn db_query(input: TokenStream) -> TokenStream {
                         debug!("db_query in var ele.len: {}", where_sql.len());
 
                         // 带wherein条件的情况
-                        let mut query = orm_scylladb::scylla::query::Query::new(cql.clone());
+                        let mut query = scylla::query::Query::new(cql.clone());
                         orm_scylladb::scylladb::wherein2(&mut query, where_sql);
 
                         debug!("cql: {}", query.contents);
@@ -98,7 +98,7 @@ pub fn db_query(input: TokenStream) -> TokenStream {
                         r_rows.append(&mut rows);
                     }
                 }else{
-                    let query = orm_scylladb::scylla::query::Query::new(cql.clone());
+                    let query = scylla::query::Query::new(cql.clone());
                     debug!("cql: {}", query.contents);
                     let mut rows = session.query(query, &[]).await?.rows()?;
                     r_rows.append(&mut rows);
