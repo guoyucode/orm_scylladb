@@ -13,7 +13,7 @@ log = "*"
 serde_json = { version = "1.0", features = ["preserve_order"] }
 common_uu = {git = "https://gitee.com/guoyucode/common_uu.git", default-features = false}
 serde = { version = "1.0", features = ["derive"] }
-scylla = { version = "0.7", optional = false}
+scylla = { version = "*", optional = false}
 
 
 [dev-dependencies]
@@ -21,7 +21,7 @@ log = "*"
 serde_json = { version = "1.0", features = ["preserve_order"] }
 common_uu = {git = "https://gitee.com/guoyucode/common_uu.git", default-features = false}
 serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "1.13", features = ["rt", "rt-multi-thread", "macros", ] }
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", ] }
 
 
 [features]
