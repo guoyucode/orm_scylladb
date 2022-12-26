@@ -61,7 +61,7 @@ pub fn db_query(input: TokenStream) -> TokenStream {
             // }
 
             /// 数据库查询方法
-            pub async fn db_query<T: ToString>(session: &std::sync::Arc<orm_scylladb::scylla::Session>, where_sql: String, where_in_vars: impl Into<VecInto<T>>, limit_v: Option<isize>) -> common_uu::IResult<Vec<Self>> {
+            pub async fn db_query<T: ToString>(session: &std::sync::Arc<scylla::Session>, where_sql: String, where_in_vars: impl Into<VecInto<T>>, limit_v: Option<isize>) -> common_uu::IResult<Vec<Self>> {
 
                 let ref where_in_vars = where_in_vars.into().0;
 
