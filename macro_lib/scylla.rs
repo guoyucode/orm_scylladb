@@ -49,9 +49,31 @@ pub fn db_query(input: TokenStream) -> TokenStream {
 
     let table_fields_str = table_fields_ident.join(",");
 
+    let mut conv_code = quote::quote!();
+    for i in 0..tys.len() {
+        let ty = &tys[i];
+        let f = &fields_ident_init[i];
+        conv_code = quote::quote!(
+            #conv_code
+            let ele = cols.remove(#i);
+            let #f = #ty::from_cql(ele).map_err(|e|scylla::cql_to_rust::FromRowError::BadCqlVal { err: e, column: #i })?;
+        );
+    }
+
     let code = quote::quote! {
 
         use orm_scylladb::conv_data::*;
+
+        impl scylla::FromRow for #ident {
+            fn from_row(row: scylla::frame::response::result::Row) -> Result<Self, scylla::cql_to_rust::FromRowError> {
+                use scylla::cql_to_rust::FromCqlVal;
+                let mut cols = row.columns;
+
+                #conv_code
+
+                Ok(Self{ #(#fields_ident_init),* })
+            }
+        }
 
         impl #ident{
 
@@ -108,14 +130,14 @@ pub fn db_query(input: TokenStream) -> TokenStream {
                 let mut r_arr = vec![];
                 for item in r_rows{
                     debug!("item: {:?}", item);
-                    let ( #(#fields_ident_init),* ) = match item.into_typed::<(#(#tys),*)>(){
+                    let v = match item.into_typed::<#ident>(){
                         Err(e) => {
                             error!("into_typed: {:?} \n", e);
                             continue;
                         }
                         Ok(v) => v,
                     };
-                    r_arr.push(#ident{ #(#fields_ident_init),* });
+                    r_arr.push(v);
                 }
 
                 Ok(r_arr)
@@ -128,4 +150,3 @@ pub fn db_query(input: TokenStream) -> TokenStream {
     // empty.into()
     code.into()
 }
-
